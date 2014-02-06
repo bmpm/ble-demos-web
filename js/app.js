@@ -31,6 +31,8 @@ document.querySelector('#btn-rem-back').addEventListener ('click', function () {
 });
 
 document.querySelector('#dev-rem').addEventListener ('click', function () {
+  createRemList();
+
   document.querySelector('#remove-device').className = 'current';
   document.querySelector('[data-position="current"]').className = 'left';
 });

@@ -1,4 +1,5 @@
 var adapterPath = null;
+var remDevicePath = null;
 var bus = null;
 
 function addHeaderList(header, spin, list, ulId) {
@@ -133,9 +134,6 @@ function connect() {
   cloudeebus.connect("ws://localhost:9000", null, connectSuccess, errorCB);
 }
 
-function callRemoveDevice() {
-}
-
 function customConfirm(title, msg, type) {
   document.getElementById("conf-title").innerHTML = title;
   document.getElementById("conf-name-disc").innerHTML = msg;
@@ -265,4 +263,79 @@ function deviceScanOn() {
   bus.getObject("org.bluez", adapterPath,
       function (proxy) { proxy.StartDiscovery(); },
       errorCB);
+}
+
+function callRemoveDevice() {
+  if (remDevicePath == null) {
+    customConfirm("WARNING", "Choose a device to be removed", "danger");
+    return;
+  }
+
+  // Delete the string "remove" from beginning
+  var devPath = remDevicePath.substr(6);
+  remDevicePath = null;
+  console.log("Try removing device: " + devPath);
+
+  var obj = bus.getObject("org.bluez", adapterPath, null, errorCB);
+
+  obj.callMethod("org.bluez.Adapter1", "RemoveDevice", [devPath]).then(
+      function () { console.log("Device has been removed: " + devPath); },
+      function (error) { console.log("Remove device method: " + error); });
+}
+
+function getRemDevices(objs) {
+  var devList = document.getElementById("rem-dev-list-ul");
+
+  for (o in objs) {
+
+    if (objs[o]["org.bluez.Device1"] == null)
+      continue;
+
+    var devItem = document.createElement("li");
+    devItem.setAttribute("data-name", objs[o]["org.bluez.Device1"]["Alias"]);
+
+    devItem.id = "remove" + o;
+
+    var checkLabel = document.createElement("label");
+    checkLabel.className = "pack-radio danger";
+
+    var input = document.createElement("input");
+    input.addEventListener("click", function (e) { e.stopPropagation(); });
+    input.type = "radio";
+    input.name = "choose-dev";
+
+    var span = document.createElement("span");
+
+    checkLabel.appendChild(input);
+    checkLabel.appendChild(span);
+
+    devItem.addEventListener("click", function (e) {
+      console.log("Device to remove: " + this.getAttribute("data-name"));
+
+      remDevicePath = this.id;
+    });
+
+    var devA = document.createElement("a");
+    var devP = document.createElement("p");
+    var devTitle = document.createTextNode(objs[o]["org.bluez.Device1"]["Alias"]);
+
+    devP.appendChild(devTitle);
+    devA.appendChild(devP);
+    devItem.appendChild(checkLabel);
+    devItem.appendChild(devA);
+    devList.appendChild(devItem);
+  }
+}
+
+function createRemList() {
+  clearAllList("rem-dev-list");
+  addHeaderList("Choose a device", null, "rem-dev-list", "rem-dev-list-ul");
+  remDevicePath = null;
+
+  var ulItem = document.getElementById("rem-dev-list-ul");
+  ulItem.setAttribute("data-type", "edit");
+
+  bus.getObject("org.bluez", "/",
+      function (proxy) { proxy.GetManagedObjects().then(getRemDevices, errorCB); },
+      function (error) { console.log("Remove device list: " + error); });
 }
