@@ -34,6 +34,31 @@ function errorCB(error) {
   console.log("error: " + error + "\n");
 }
 
+function successPairCB(path, msg) {
+  console.log(msg);
+  delItemList("discovery" + path);
+  customConfirm("Result", msg, "");
+}
+
+function callPairDevice(path, alias, paired) {
+  console.log("Pair device: " + path + ", paired: " + paired);
+
+  var obj = bus.getObject("org.bluez", path, null, errorCB);
+
+  if (paired == 0) {
+    console.log("Attempting to pair with " + alias);
+    obj.callMethod("org.bluez.Device1", "Pair", []).then(
+        function () { successPairCB(path, "Device " + alias + " : " + "Pairing successful"); },
+        function (error) { errorPairCB(error, "Failed to pair: " + alias); });
+  }
+  else {
+    console.log("Already paired, attempting to connect with " + alias);
+    obj.callMethod("org.bluez.Device1", "Connect", []).then(
+        function () { successPairCB(path, "Device " + alias + " : " + "Connection successful"); },
+        function (error) { errorPairCB(error, "Failed to connect: " + alias); });
+  }
+}
+
 function addItemList(properties, ulItem, path) {
   var devList = document.getElementById(ulItem);
   var devItem = document.createElement("li");
@@ -44,7 +69,7 @@ function addItemList(properties, ulItem, path) {
   devItem.addEventListener("click", function (e) {
     console.log("Pair to device (clicked): " + this.getAttribute("data-name"));
 
-    // FIXME: Add pair to device function
+    callPairDevice(path, this.getAttribute("data-name"), properties["Paired"]);
   });
 
   var devA = document.createElement("a");
