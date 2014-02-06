@@ -246,3 +246,23 @@ function createDiscList() {
     function (proxy) { proxy.GetManagedObjects().then(getTMPDevices, errorCB); },
     function (error) { console.log("Device discovery list: " + error); });
 }
+
+function stopScan(proxy) {
+  proxy.StopDiscovery();
+}
+
+function deviceScanOff() {
+  console.log("Stop scanning ...");
+  document.getElementById("spin-dev-disc").style.visibility = "hidden";
+  bus.getObject("org.bluez", adapterPath,
+      function (proxy) { proxy.StopDiscovery(); },
+      errorCB);
+}
+
+function deviceScanOn() {
+  console.log("Start scanning ...");
+  document.getElementById("spin-dev-disc").style.visibility = "visible";
+  bus.getObject("org.bluez", adapterPath,
+      function (proxy) { proxy.StartDiscovery(); },
+      errorCB);
+}
