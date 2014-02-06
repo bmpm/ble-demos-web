@@ -57,12 +57,50 @@ function addItemList(properties, ulItem, path) {
   devList.appendChild(devItem);
 }
 
+function delItemList(item) {
+  var node = document.getElementById(item);
+
+  if (node == null)
+    return;
+
+  node.parentNode.removeChild(node);
+}
+
+function interfacesAdded(path, interfaces) {
+  console.log("Interface added: " + path);
+
+  if (interfaces == null)
+    return;
+
+  var properties = interfaces["org.bluez.Device1"];
+
+  if (properties == null)
+    return;
+
+  console.log("[ " + properties["Address"] + " ]");
+  addItemList(properties, "dev-disc-list-ul", path)
+}
+
+function interfacesRemoved(path, interfaces) {
+  console.log("Interface removed: " + path);
+
+  if (document.querySelector('#dev-discovery').className == 'current') {
+      delItemList("discovery" + path);
+  } else if (document.querySelector('#remove-device').className == 'current') {
+      delItemList("remove" + path);
+  } else
+      delItemList(path);
+}
+
 function connectSuccess() {
   bus = cloudeebus.SystemBus();
   console.log("Connected to cloudeebus");
 
   bus.getObject("org.bluez", "/",
-      function (proxy) { proxy.GetManagedObjects().then(getDevices, errorCB); },
+      function (proxy) {
+        proxy.connectToSignal("org.freedesktop.DBus.ObjectManager", "InterfacesAdded", interfacesAdded, errorCB);
+        proxy.connectToSignal("org.freedesktop.DBus.ObjectManager", "InterfacesRemoved", interfacesRemoved, errorCB);
+        proxy.GetManagedObjects().then(getDevices, errorCB); },
       function (error) { console.log("Device list: " + error); });
 }
 
