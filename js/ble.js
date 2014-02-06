@@ -12,3 +12,6 @@ function connectSuccess() {
 function connect() {
   cloudeebus.connect("ws://localhost:9000", null, connectSuccess, errorCB);
 }
+
+function callRemoveDevice() {
+}
