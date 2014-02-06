@@ -1,6 +1,7 @@
 document.querySelector('#btn-disc-back').addEventListener ('click', function () {
   document.querySelector('#dev-discovery').className = 'right';
   document.querySelector('[data-position="current"]').className = 'current';
+  rebuildDevList();
 });
 
 document.querySelector('#btn-stop-disc').addEventListener ('click', function () {
@@ -19,6 +20,7 @@ document.querySelector('#dev-search').addEventListener ('click', function () {
 document.querySelector('#btn-rem-back').addEventListener ('click', function () {
   document.querySelector('#remove-device').className = 'right';
   document.querySelector('[data-position="current"]').className = 'current';
+  rebuildDevList();
 });
 
 document.querySelector('#dev-rem').addEventListener ('click', function () {
