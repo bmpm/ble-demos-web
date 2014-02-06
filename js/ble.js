@@ -15,3 +15,11 @@ function connect() {
 
 function callRemoveDevice() {
 }
+
+function customConfirm(title, msg, type) {
+  document.getElementById("conf-title").innerHTML = title;
+  document.getElementById("conf-name-disc").innerHTML = msg;
+  document.getElementById("conf-button").className = type;
+
+  document.querySelector('#confirm').className = 'fade-in';
+}

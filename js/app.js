@@ -26,3 +26,6 @@ document.querySelector('#dev-rem').addEventListener ('click', function () {
   document.querySelector('[data-position="current"]').className = 'left';
 });
 
+document.querySelector('#confirm').addEventListener ('click', function () {
+  this.className = 'fade-out';
+});
