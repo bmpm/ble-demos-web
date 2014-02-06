@@ -13,6 +13,8 @@ document.querySelector('#btn-stop-disc').addEventListener ('click', function () 
 });
 
 document.querySelector('#dev-search').addEventListener ('click', function () {
+  createDiscList();
+
   document.querySelector('#dev-discovery').className = 'current';
   document.querySelector('[data-position="current"]').className = 'left';
 });

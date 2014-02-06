@@ -34,6 +34,29 @@ function errorCB(error) {
   console.log("error: " + error + "\n");
 }
 
+function addItemList(properties, ulItem, path) {
+  var devList = document.getElementById(ulItem);
+  var devItem = document.createElement("li");
+
+  devItem.setAttribute("data-name", properties["Alias"]);
+  devItem.id = "discovery" + path;
+
+  devItem.addEventListener("click", function (e) {
+    console.log("Pair to device (clicked): " + this.getAttribute("data-name"));
+
+    // FIXME: Add pair to device function
+  });
+
+  var devA = document.createElement("a");
+  var devP = document.createElement("p");
+  var devTitle = document.createTextNode(properties["Alias"]);
+
+  devP.appendChild(devTitle);
+  devA.appendChild(devP);
+  devItem.appendChild(devA);
+  devList.appendChild(devItem);
+}
+
 function connectSuccess() {
   bus = cloudeebus.SystemBus();
   console.log("Connected to cloudeebus");
@@ -134,4 +157,29 @@ function getDevices(objs) {
       devItem.appendChild(devA);
       devList.appendChild(devItem);
   }
+}
+
+function getTMPDevices(objs) {
+  for (o in objs) {
+    if (objs[o]["org.bluez.Device1"] == null)
+      continue;
+
+    // Get temporary devices and not connect devices (already paired)
+    if (objs[o]["org.bluez.Device1"]["Connected"] == 1)
+      continue;
+
+    console.log("Device discovery: " + objs[o]["org.bluez.Device1"]["Alias"] +
+                ", path: " + o);
+    addItemList(objs[o]["org.bluez.Device1"], "dev-disc-list-ul", o);
+  }
+}
+
+function createDiscList() {
+  clearAllList("dev-disc-list");
+  addHeaderList("Devices Found", "spin-dev-disc", "dev-disc-list", "dev-disc-list-ul");
+  document.querySelector('#btn-stop-disc').innerHTML = "STOP";
+
+  bus.getObject("org.bluez", "/",
+    function (proxy) { proxy.GetManagedObjects().then(getTMPDevices, errorCB); },
+    function (error) { console.log("Device discovery list: " + error); });
 }
