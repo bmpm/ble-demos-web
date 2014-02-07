@@ -172,6 +172,79 @@ function propertiesChanged(iface, changed, invalidated) {
     setEnabledItem(this.objectPath, "false");
 }
 
+function getService(objs, pathDevice, uuid) {
+  var service = null;
+
+  for (o in objs) {
+    if (objs[o]["org.bluez.Service1"] == null)
+      continue;
+
+    if (objs[o]["org.bluez.Service1"]["UUID"] == uuid) {
+
+      if (o.indexOf(pathDevice) == 0) {
+        console.log("Found " + uuid + " " + o);
+        service = o;
+        break;
+      }
+    }
+  }
+
+  if (service == null)
+    console.log(uuid + "service not found");
+
+    return service;
+}
+
+function getChar(objs, pathService, uuid) {
+  var chr = null;
+
+  for (o in objs) {
+    if (objs[o]["org.bluez.Characteristic1"] == null)
+      continue;
+
+    if (objs[o]["org.bluez.Characteristic1"]["UUID"] == uuid) {
+
+      if (o.indexOf(pathService) == 0) {
+        console.log("Found " + uuid + " " + o);
+        chr = o;
+        break;
+      }
+    }
+  }
+
+  if (chr == null)
+    console.log(uuid + " for " + svc[uuid] + " not found");
+
+  return chr;
+}
+
+function gotMeasurement(iface, changed, invalidated) {
+  if (iface != "org.bluez.Characteristic1")
+    return;
+
+  if (changed["Value"] == null)
+    return;
+
+  var temp = changed["Value"][1]/100 + changed["Value"][2];
+  console.log("gotMeasurement: " + changed["Value"] + " " + temp);
+
+  document.getElementById("measurement").innerHTML = temp + " C";
+}
+
+function callThermometer(objs, o) {
+  var pathHTS = getService(objs, o, "00001809-0000-1000-8000-00805f9b34fb");
+  if (pathHTS)
+    var measurementChr = getChar(objs, pathHTS, "00002a1e-0000-1000-8000-00805f9b34fb");
+  console.log("pathHTS: " + pathHTS);
+  bus.getObject("org.bluez", measurementChr,
+    function (proxy) { proxy.connectToSignal("org.freedesktop.DBus.Properties",
+                      "PropertiesChanged", gotMeasurement, errorCB); },
+    function (error) { console.log("Properties changed handler: " + error); });
+
+  document.querySelector('#thermometer').className = 'current';
+  document.querySelector('[data-position="current"]').className = 'left';
+}
+
 function getDevices(objs) {
   clearAllList("dev-list");
 
@@ -206,7 +279,8 @@ function getDevices(objs) {
       devItem.addEventListener("click", function (e) {
           console.log("Clicked device: " + this.getAttribute("data-name"));
 
-          // FIXME: call thermometer value window
+          document.getElementById("dev-name").innerHTML = "Device name: " + this.getAttribute("data-name");
+          callThermometer(objs, this.id);
       });
 
       var devA = document.createElement("a");

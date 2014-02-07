@@ -40,3 +40,8 @@ document.querySelector('#dev-rem').addEventListener ('click', function () {
 document.querySelector('#confirm').addEventListener ('click', function () {
   this.className = 'fade-out';
 });
+
+document.querySelector('#btn-therm-back').addEventListener ('click', function () {
+  document.querySelector('#thermometer').className = 'right';
+  document.querySelector('[data-position="current"]').className = 'current';
+});
