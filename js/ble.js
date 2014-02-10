@@ -235,6 +235,25 @@ function gotMeasurement(iface, changed, invalidated) {
   document.getElementById("measurement").innerHTML = temp + " C";
 }
 
+function discServices(uuids) {
+  var profile = -1;
+
+  for (u in uuids) {
+    console.log(uuids[u]);
+    switch (uuids[u]) {
+      case "00001802-0000-1000-8000-00805f9b34fb":
+      case "00001803-0000-1000-8000-00805f9b34fb":
+        profile = 0;
+        break;
+      case "00001809-0000-1000-8000-00805f9b34fb":
+        profile = 1;
+        break;
+    }
+  }
+
+  return profile;
+}
+
 function callThermometer(objs, o) {
   var pathHTS = getService(objs, o, "00001809-0000-1000-8000-00805f9b34fb");
   if (pathHTS)
@@ -280,12 +299,26 @@ function getDevices(objs) {
       devItem.id = o;
       if (objs[o]["org.bluez.Device1"]["Connected"] == 0)
         devItem.setAttribute("aria-disabled", "true");
-      devItem.addEventListener("click", function (e) {
-          console.log("Clicked device: " + this.getAttribute("data-name"));
+      var profile = discServices(objs[o]["org.bluez.Device1"]["UUIDs"]);
 
-          document.getElementById("dev-name").innerHTML = "Device name: " + this.getAttribute("data-name");
-          callThermometer(objs, this.id);
-      });
+      switch (profile) {
+        case 0:
+          // FIXME: Call proximity window
+          break;
+        case 1:
+          devItem.addEventListener("click", function (e) {
+              console.log("Clicked device: " + this.getAttribute("data-name"));
+
+              document.getElementById("dev-name").innerHTML = "Device name: " +
+                this.getAttribute("data-name");
+              callThermometer(objs, this.id);
+          });
+          break;
+        default:
+          devItem.addEventListener("click", function (e) {
+            customConfirm("WARNING", "No profile supported found!", "danger");
+          });
+      }
 
       buildItem(devList, devItem, objs[o]["org.bluez.Device1"]["Alias"]);
   }
