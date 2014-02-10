@@ -60,6 +60,17 @@ function callPairDevice(path, alias, paired) {
   }
 }
 
+function buildItem(devList, devItem, title) {
+  var devA = document.createElement("a");
+  var devP = document.createElement("p");
+  var devTitle = document.createTextNode(title);
+
+  devP.appendChild(devTitle);
+  devA.appendChild(devP);
+  devItem.appendChild(devA);
+  devList.appendChild(devItem);
+}
+
 function addItemList(properties, ulItem, path) {
   var devList = document.getElementById(ulItem);
   var devItem = document.createElement("li");
@@ -73,14 +84,7 @@ function addItemList(properties, ulItem, path) {
     callPairDevice(path, this.getAttribute("data-name"), properties["Paired"]);
   });
 
-  var devA = document.createElement("a");
-  var devP = document.createElement("p");
-  var devTitle = document.createTextNode(properties["Alias"]);
-
-  devP.appendChild(devTitle);
-  devA.appendChild(devP);
-  devItem.appendChild(devA);
-  devList.appendChild(devItem);
+  buildItem(devList, devItem, properties["Alias"]);
 }
 
 function delItemList(item) {
@@ -283,14 +287,7 @@ function getDevices(objs) {
           callThermometer(objs, this.id);
       });
 
-      var devA = document.createElement("a");
-      var devP = document.createElement("p");
-      var devTitle = document.createTextNode(objs[o]["org.bluez.Device1"]["Alias"]);
-
-      devP.appendChild(devTitle);
-      devA.appendChild(devP);
-      devItem.appendChild(devA);
-      devList.appendChild(devItem);
+      buildItem(devList, devItem, objs[o]["org.bluez.Device1"]["Alias"]);
   }
 }
 
@@ -389,15 +386,8 @@ function getRemDevices(objs) {
       remDevicePath = this.id;
     });
 
-    var devA = document.createElement("a");
-    var devP = document.createElement("p");
-    var devTitle = document.createTextNode(objs[o]["org.bluez.Device1"]["Alias"]);
-
-    devP.appendChild(devTitle);
-    devA.appendChild(devP);
     devItem.appendChild(checkLabel);
-    devItem.appendChild(devA);
-    devList.appendChild(devItem);
+    buildItem(devList, devItem, objs[o]["org.bluez.Device1"]["Alias"]);
   }
 }
 
