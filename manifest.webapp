@@ -1,6 +1,6 @@
 {
-  "name": "Thermometer BLE",
-  "description": "Thermomether BLE Demo App",
+  "name": "BLE demos",
+  "description": "BLE Demos App",
   "launch_path": "/app.html",
   "icons": {
     "128": "/images/app_icon_128.png",
