@@ -1,3 +1,5 @@
+var iasalertlevelchr = null;
+var llsalertlevelchr = null;
 var adapterPath = null;
 var remDevicePath = null;
 var bus = null;
@@ -435,4 +437,14 @@ function createRemList() {
   bus.getObject("org.bluez", "/",
       function (proxy) { proxy.GetManagedObjects().then(getRemDevices, errorCB); },
       function (error) { console.log("Remove device list: " + error); });
+}
+
+function immAlert(value) {
+  if (iasAlertLevelChr == null)
+    return;
+}
+
+function llsAlert(value) {
+  if (llsAlertLevelChr == null)
+    return;
 }

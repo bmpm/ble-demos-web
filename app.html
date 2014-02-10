@@ -194,8 +194,53 @@
       <center><label id="measurement" style="color: #424242;font-size: 5rem;">25 C</label></center>
     </article>
   </section>
-  <script type="text/javascript" src="js/app.js"></script>
 
+  <!--····························· Proximity ·····························-->
+  <section role="region" id="proximity" data-position="right">
+    <header class="fixed">
+      <a id="btn-prox-back" href="#"><span class="icon icon-back">back</span></a>
+      <h1>Proximity & FindMe</h1>
+    </header>
+    <article class="content scrollable header">
+      <header><h2>Device name</h2></header>
+      <label id="dev-name-prox" style="color: #424242;font-size: 1.2rem;"></label>
+      <header><h2>Imediate Alert Level</h2></header>
+      <label class="pack-radio">
+        <input type="radio" name="ias" id="ias-none" onclick="immAlert(0)">
+        <span></span>
+      </label>
+      <label>none</label>
+      <label class="pack-radio">
+        <input type="radio" name="ias" id="ias-mild" onclick="immAlert(1)">
+        <span></span>
+      </label>
+      <label>mild</label>
+      <label class="pack-radio">
+        <input type="radio" name="ias" id="ias-high" onclick="immAlert(2)">
+        <span></span>
+      </label>
+      <label>high</label>
+      <header><h2>Link Loss Alert Level</h2></header>
+      <label class="pack-radio">
+        <input type="radio" name="lls" id="lls-none" onclick="llsAlert(0)"/>
+        <span></span>
+      </label>
+      <label>none</label>
+      <label class="pack-radio">
+        <input type="radio" name="lls" id="lls-mild" onclick="llsAlert(1)"/>
+        <span></span>
+      </label>
+      <label>mild</label>
+      <label class="pack-radio">
+        <input type="radio" name="lls" id="lls-high" onclick="llsAlert(2)"/>
+        <span></span>
+      </label>
+      <label>high</label>
+      <span></span>
+    </article>
+  </section>
+
+  <script type="text/javascript" src="js/app.js"></script>
 </body>
 </html>
 

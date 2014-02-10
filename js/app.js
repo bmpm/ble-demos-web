@@ -45,3 +45,8 @@ document.querySelector('#btn-therm-back').addEventListener ('click', function ()
   document.querySelector('#thermometer').className = 'right';
   document.querySelector('[data-position="current"]').className = 'current';
 });
+
+document.querySelector('#btn-prox-back').addEventListener ('click', function () {
+  document.querySelector('#proximity').className = 'right';
+  document.querySelector('[data-position="current"]').className = 'current';
+});
