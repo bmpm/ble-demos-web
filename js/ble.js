@@ -43,6 +43,11 @@ function successPairCB(path, msg) {
   customConfirm("Result", msg, "");
 }
 
+function errorPairCB(error, msg) {
+  console.log(msg + "  " + error);
+  customConfirm("WARNING", msg, "danger");
+}
+
 function callPairDevice(path, alias, paired) {
   console.log("Pair device: " + path + ", paired: " + paired);
 
