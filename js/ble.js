@@ -171,11 +171,16 @@ function propertiesChanged(iface, changed, invalidated) {
   if (changed["Connected"] == null)
     return;
 
+  var devName = this.Alias;
   if (changed["Connected"] == 0) {
     customConfirm("WARNING", "Device " + this.Alias + " disconnected", "danger");
     setEnabledItem(this.objectPath, "true");
+    devName += "(disconnected)";
   } else
     setEnabledItem(this.objectPath, "false");
+
+  if (document.querySelector('#proximity').className == 'current')
+    document.getElementById("dev-name-prox").innerHTML = devName;
 }
 
 function getService(objs, pathDevice, uuid) {
@@ -305,7 +310,13 @@ function getDevices(objs) {
 
       switch (profile) {
         case 0:
-          // FIXME: Call proximity window
+          devItem.addEventListener("click", function (e) {
+              console.log("Clicked device: " + this.getAttribute("data-name"));
+
+              document.getElementById("dev-name-prox").innerHTML = "Device name: " +
+                this.getAttribute("data-name");
+              callProximity(objs, this.id);
+          });
           break;
         case 1:
           devItem.addEventListener("click", function (e) {
@@ -442,9 +453,53 @@ function createRemList() {
 function immAlert(value) {
   if (iasAlertLevelChr == null)
     return;
+
+  function successCB() {
+    cloudeebus.log("Set IAS alert level to " + value);
+  }
+
+  /* FIXME: add support for D-Bus byte array (e.g. converted from Uint8Array())
+   * so the methods with "ay" signature can use the automatic introspection. */
+  var obj = bus.getObject("org.bluez", iasAlertLevelChr, null, errorCB);
+  obj.callMethod("org.freedesktop.DBus.Properties", "Set",
+      ["org.bluez.Characteristic1", "Value", [value]], "ssv").then(successCB, errorCB);
 }
 
 function llsAlert(value) {
   if (llsAlertLevelChr == null)
     return;
+
+  function successCB() {
+    cloudeebus.log("Set LLS alert level to " + value);
+  }
+
+  /* FIXME: add support for D-Bus byte array (e.g. converted from Uint8Array())
+  * so the methods with "ay" signature can use the automatic introspection. */
+  var obj = bus.getObject("org.bluez", llsAlertLevelChr, null, errorCB);
+  obj.callMethod("org.freedesktop.DBus.Properties", "Set",
+      ["org.bluez.Characteristic1", "Value", [value]], "ssv").then(successCB, errorCB);
+}
+
+function cleanRadioButtons() {
+  document.getElementById("ias-none").checked = false;
+  document.getElementById("ias-mild").checked = false;
+  document.getElementById("ias-high").checked = false;
+
+  document.getElementById("lls-none").checked = false;
+  document.getElementById("lls-mild").checked = false;
+  document.getElementById("lls-high").checked = false;
+}
+
+function callProximity(objs, o) {
+  var pathIasService = getService(objs, o, "00001802-0000-1000-8000-00805f9b34fb");
+  if (pathIasService)
+    iasAlertLevelChr = getChar(objs, pathIasService, "00002a06-0000-1000-8000-00805f9b34fb");
+
+  var pathLlsService = getService(objs, o, "00001803-0000-1000-8000-00805f9b34fb");
+  if (pathLlsService)
+    llsAlertLevelChr = getChar(objs, pathLlsService, "00002a06-0000-1000-8000-00805f9b34fb");
+
+  cleanRadioButtons();
+  document.querySelector('#proximity').className = 'current';
+  document.querySelector('[data-position="current"]').className = 'left';
 }
