@@ -40,11 +40,13 @@ function errorCB(error) {
 function successPairCB(path, msg) {
   console.log(msg);
   delItemList("discovery" + path);
+  document.querySelector('#wait').className = 'fade-out';
   customConfirm("Result", msg, "");
 }
 
 function errorPairCB(error, msg) {
   console.log(msg + "  " + error);
+  document.querySelector('#wait').className = 'fade-out';
   customConfirm("WARNING", msg, "danger");
 }
 
@@ -65,6 +67,7 @@ function callPairDevice(path, alias, paired) {
         function () { successPairCB(path, "Device " + alias + " : " + "Connection successful"); },
         function (error) { errorPairCB(error, "Failed to connect: " + alias); });
   }
+  customWait("Status", "Connecting: waiting for device response", "danger");
 }
 
 function buildItem(devList, devItem, title) {
@@ -151,6 +154,13 @@ function customConfirm(title, msg, type) {
   document.getElementById("conf-button").className = type;
 
   document.querySelector('#confirm').className = 'fade-in';
+}
+
+function customWait(title, msg, type) {
+  document.getElementById("wait-title").innerHTML = title;
+  document.getElementById("wait-msg").innerHTML = msg;
+
+  document.querySelector('#wait').className = 'fade-in';
 }
 
 function rebuildDevList() {
